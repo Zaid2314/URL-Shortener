@@ -20,7 +20,10 @@ A simple and efficient URL Shortener built using **Node.js**, **Express**, and *
 - **Database:** MongoDB, Mongoose
 - **Templating Engine:** EJS
 - **Libraries:** shortid (for unique IDs), dotenv (if using environment variables)
-![App Screenshot](screenshot.png)
+## 📸 Screenshot
+
+![App Screenshot](Screenshot%202025-06-16%20144838.png)
+
 
 
 
