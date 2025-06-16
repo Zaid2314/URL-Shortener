@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>URL Shortener</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      background: #f4f4f4;
+      text-align: center;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    form {
+      margin-top: 20px;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      width: 60%;
+      max-width: 400px;
+      margin-right: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      padding: 10px 15px;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .short-url-box {
+      margin-top: 20px;
+      background: #e7f3ff;
+      padding: 10px 15px;
+      border-radius: 5px;
+      display: inline-block;
+    }
+
+    table {
+      margin: 30px auto;
+      border-collapse: collapse;
+      width: 90%;
+      max-width: 800px;
+      background: white;
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
+
+    th {
+      background-color: #007bff;
+      color: white;
+    }
+
+    td {
+      color: #333;
+    }
+
+    .copy-btn {
+      margin-left: 10px;
+      padding: 5px 10px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    .copy-btn:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+  <h1>🌐 URL Shortener</h1>
+
+  <% if (id) { %>
+    <div class="short-url-box">
+      <strong>Short URL:</strong>
+      <span id="shortUrl">http://localhost:8001/url/<%= id %></span>
+      <button class="copy-btn" onclick="copyToClipboard()">Copy</button>
+    </div>
+  <% } %>
+
+  <form method="POST" action="/url">
+    <label for="url"><strong>Enter your Original URL:</strong></label><br>
+    <input type="text" name="url" placeholder="https://www.example.com" required>
+    <button type="submit">Generate</button>
+  </form>
+
+  <% if (urls && urls.length > 0) { %>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Short ID</th>
+          <th>Original URL</th>
+          <th>Clicks</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% urls.forEach((url, index) => { %>
+          <tr>
+            <td><%= index + 1 %></td>
+            <td><a href="/url/<%= url.shortId %>" target="_blank"><%= url.shortId %></a></td>
+            <td><%= url.redirectUrl %></td>
+            <td><%= url.visitHistory.length %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+    <form action="/clear-history" method="GET" onsubmit="return confirm('Are you sure you want to delete all URLs?');">
+  <button type="submit" style="margin-top: 10px; background-color: red; color: white;">Clear All History</button>
+</form>
+
+  <% } %>
+
+  <script>
+    function copyToClipboard() {
+      const text = document.getElementById('shortUrl').innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Copied to clipboard!");
+      });
+    }
+  </script>
+</body>
+</html>
