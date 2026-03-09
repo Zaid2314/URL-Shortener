@@ -1,5 +1,6 @@
 const shortid = require("shortid");
 const {URL} = require("../models/url");
+const redisClient = require("../config/redis");
 
 
 async function handleGenerateNewShortURL(req,res) {
@@ -31,8 +32,45 @@ async function handleGetAnalytics(req,res) {
             analytics: result.visitHistory,
         });
 }
+async function handleRedirect(req, res) {
+
+    const shortId = req.params.shortId;
+
+    // check Redis cache
+    const cachedUrl = await redisClient.get(shortId);
+
+    if (cachedUrl) {
+        console.log("Cache HIT");
+        return res.redirect(cachedUrl);
+    }
+
+    console.log("Cache MISS");
+
+    const entry = await URL.findOneAndUpdate(
+        { shortId },
+        {
+            $push: {
+                visitHistory: {
+                    timestamp: Date.now()
+                }
+            }
+        }
+    );
+
+    if (!entry) {
+        return res.status(404).send("Short URL not found");
+    }
+
+    // store in Redis cache
+    await redisClient.set(shortId, entry.redirectUrl, {
+        EX: 3600
+    });
+
+    res.redirect(entry.redirectUrl);
+}
 
 module.exports = {
     handleGenerateNewShortURL,
-    handleGetAnalytics
-}
+    handleGetAnalytics,
+    handleRedirect
+};
